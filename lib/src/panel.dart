@@ -17,7 +17,7 @@ enum SlideDirection {
   DOWN,
 }
 
-enum PanelState { OPEN, CLOSED }
+enum PanelState { OPEN, CLOSED, SNAP }
 
 class SlidingUpPanel extends StatefulWidget {
   /// The Widget that slides into view. When the
@@ -218,13 +218,23 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
   @override
   void initState() {
     super.initState();
-
+    final double animationValue;
+    switch (widget.defaultPanelState) {
+      case PanelState.OPEN:
+        animationValue = 1;
+        break;
+      case PanelState.CLOSED:
+        animationValue = 0;
+        break;
+      case PanelState.SNAP:
+        animationValue = widget.snapPoint ?? 0;
+        break;
+    }
     _ac = new AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
-        value: widget.defaultPanelState == PanelState.CLOSED
-            ? 0.0
-            : 1.0 //set the default panel state (i.e. set initial value of _ac)
+        value:
+            animationValue //set the default panel state (i.e. set initial value of _ac)
         )
       ..addListener(() {
         if (widget.onPanelSlide != null) widget.onPanelSlide!(_ac.value);
